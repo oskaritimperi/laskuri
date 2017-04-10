@@ -1,0 +1,4 @@
+Customer,InvoiceNr,Product,Amount,Unit,Price,Vat
+Matti Mallikas,17000,Jäsenmaksu,1,kpl,20,0
+,17000,T-Paita,1,kpl,15,10
+Maija Mallikas,17001,Pikkujoulu,1,kpl,49,0

@@ -1,0 +1,8 @@
+invoicer = ""
+address_line_1 = ""
+address_line_2 = ""
+business_id = ""
+www_address = ""
+iban = ""
+bic_swift = ""
+date_fmt = "%d.%m.%Y"
