@@ -10,6 +10,26 @@ local data = ftcsv.parse("invoices.csv", ",")
 
 -- Do some preprocessing for each row
 
+-- Convert column names to internal representation. Also set defaults.
+for _, row in pairs(data) do
+    for columnid, column in pairs(columns) do
+        if column ~= "" then
+            local value = row[column]
+            if not value then
+                row[columnid] = defaults[columnid] or ""
+            else
+                if value == "" then
+                    value = defaults[columnid] or ""
+                end
+                row[columnid] = value
+                row[column] = nil
+            end
+        else
+            row[columnid] = defaults[columnid] or ""
+        end
+    end
+end
+
 local num_fields = { "Amount", "Price", "Vat" }
 
 for _, row in pairs(data) do
@@ -34,11 +54,17 @@ for invoice_nr, rows in pairs(invoices) do
     local price = 0.0
     local final_price = 0.0
     local tax = 0.0
+    local ref = nil
 
     for _, row in pairs(rows) do
         price = price + row.Price
         final_price = final_price + row.FinalPrice
         tax = tax + row.Tax
+        ref = row.ReferenceNr
+    end
+
+    if ref and ref == "" then
+        ref = nil
     end
 
     rows.data = {
@@ -46,7 +72,7 @@ for invoice_nr, rows in pairs(invoices) do
         FinalPrice = final_price,
         Tax = tax,
         Due = utils.due_date(14, date_fmt),
-        ReferenceNum = refnum.refnum(invoice_nr),
+        ReferenceNr = ref or refrefnum.refnum(invoice_nr),
     }
 end
 
@@ -97,7 +123,7 @@ for invoice_nr, invoice in pairs(invoices) do
     page:TextCell(8, 7, 3, 1, invoice.data.Due, "left")
 
     page:SetFontAndSize(font_bold, 10)
-    page:TextCell(0, 5, 3, 1, invoice[1].Customer, "left")
+    page:TextCell(0, 5, 5, 3, invoice[1].Customer, "left")
 
     page:SetFontAndSize(font, 10)
     page:TextCell(0,  10, 3, 1,  "Nimike", "left")
@@ -139,7 +165,7 @@ for invoice_nr, invoice in pairs(invoices) do
 
     page:TextCell(0,  45, 7, 1, "Viitenumero:", "left")
     page:SetFontAndSize(font_bold, 10)
-    page:TextCell(0,  46, 7, 1, invoice.data.ReferenceNum, "left")
+    page:TextCell(0,  46, 7, 1, invoice.data.ReferenceNr, "left")
     page:SetFontAndSize(font, 10)
     page:TextCell(7,  45, 7, 1, "Yhteensä EUR:", "left")
     page:SetFontAndSize(font_bold, 10)
